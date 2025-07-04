@@ -1,0 +1,1 @@
+{'mode': 'implementation', 'projectName': 'ABNEG Online Portal', 'aiAgentRules': {'enforceTasksFrom': 'docs/abneg-portal_Implementation_Smart_Tasks.md', 'waitForUserConfirmation': True, 'taskCompletionCheck': True, 'contextTags': ['implementation', 'live'], 'promptStyle': 'production'}, 'notes': 'Do not suggest or prototype. This project is in active implementation.'}
