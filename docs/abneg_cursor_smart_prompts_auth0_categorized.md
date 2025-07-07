@@ -184,7 +184,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Build a role management dashboard for Super Admin. List all users, their assigned roles, and allow manual role reassignment using Drizzle + REST mutations.
+- [x] Build a role management dashboard for Super Admin. List all users, their assigned roles, and allow manual role reassignment using Drizzle + REST mutations.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.

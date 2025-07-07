@@ -9,7 +9,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // Import schema
-import { users, roles, userRoles, members } from "./src/db/schema.js";
+import { users, roles, userRoles, members } from "./src/db/schema";
 
 // Database connection
 if (!process.env['DATABASE_URL']) {
@@ -123,14 +123,19 @@ app.post("/api/users/register", async (req: any, res: any) => {
       roleId: defaultRole[0].id,
     });
 
-    // Create member record
-    await db.insert(members).values({
+    // Create member record with logging
+    console.log("Attempting to insert into members table for userId:", newUser[0].id);
+    const insertedMembers = await db.insert(members).values({
       userId: newUser[0].id,
       status: "active",
-    });
+      location: "", // Provide default value for NOT NULL constraint
+      phone: "",    // Provide default value for NOT NULL constraint
+    }).returning();
+    console.log("Inserted member record:", insertedMembers);
 
     res.status(201).json({ 
       user: newUser[0],
+      member: insertedMembers[0],
       message: "User registered successfully with member role" 
     });
   } catch (error) {
@@ -252,11 +257,21 @@ app.delete("/api/users/:auth0Id/roles/:roleName", async (req: any, res: any) => 
   }
 });
 
-// Get all users with their roles (admin only)
-app.get("/api/users", async (req: any, res: any) => {
+// --- Super Admin Middleware ---
+function requireSuperAdmin(req: any, res: any, next: any) {
+  // Assume Auth0 user info is in req.auth and roles in req.auth["https://abneg-portal/roles"]
+  const user = req.auth;
+  const roles = user && (user["https://abneg-portal/roles"] || []);
+  if (!roles.includes("super_admin")) {
+    return res.status(403).json({ error: "Access denied: Super Admins only" });
+  }
+  next();
+}
+
+// Get all users with their roles (Super Admin only)
+app.get("/api/users", requireSuperAdmin, async (req: any, res: any) => {
   try {
     const allUsers = await db.select().from(users);
-    
     const usersWithRoles = await Promise.all(
       allUsers.map(async (user: any) => {
         const userRoleData = await db
@@ -269,18 +284,40 @@ app.get("/api/users", async (req: any, res: any) => {
           .from(userRoles)
           .innerJoin(roles, eq(userRoles.roleId, roles.id))
           .where(eq(userRoles.userId, user.id));
-
         return {
           ...user,
           roles: userRoleData,
         };
       })
     );
-
     res.json({ users: usersWithRoles });
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
+// PATCH /api/users/:id/role - Update a user's role (Super Admin only)
+app.patch("/api/users/:id/role", requireSuperAdmin, async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const { newRole } = req.body;
+    if (!newRole) {
+      return res.status(400).json({ error: "New role is required" });
+    }
+    // Get the role ID
+    const role = await db.select().from(roles).where(eq(roles.name, newRole));
+    if (role.length === 0) {
+      return res.status(404).json({ error: "Role not found" });
+    }
+    // Remove all current roles for the user
+    await db.delete(userRoles).where(eq(userRoles.userId, id));
+    // Assign the new role
+    await db.insert(userRoles).values({ userId: id, roleId: role[0].id });
+    res.json({ message: "User role updated successfully" });
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    res.status(500).json({ error: "Failed to update user role" });
   }
 });
 
