@@ -13,17 +13,49 @@ export default function Navbar() {
   const { isAuthenticated, loginWithRedirect, logout, user, isLoading, getAccessTokenSilently } = useAuth0();
   const location = useLocation();
   const [isSuperAdmin, setIsSuperAdmin] = React.useState(false);
+  const [pendingLoans, setPendingLoans] = React.useState<number>(0);
+
+  // Check if user is admin or super_admin
+  const [isAdmin, setIsAdmin] = React.useState(false);
 
   React.useEffect(() => {
     const checkRole = async () => {
-      if (!isAuthenticated) return setIsSuperAdmin(false);
+      if (!isAuthenticated) {
+        setIsSuperAdmin(false);
+        setIsAdmin(false);
+        return;
+      }
       const token = await getAccessTokenSilently();
       const payload = JSON.parse(atob(token.split(".")[1]));
       const roles = payload["https://abneg-portal/roles"] || [];
       setIsSuperAdmin(roles.includes("super_admin"));
+      setIsAdmin(roles.includes("admin") || roles.includes("super_admin"));
     };
     checkRole();
   }, [isAuthenticated, getAccessTokenSilently]);
+
+  // Fetch pending loan count for admin badge
+  React.useEffect(() => {
+    const fetchPendingLoans = async () => {
+      if (!isAdmin) return;
+      try {
+        const token = await getAccessTokenSilently();
+        const res = await fetch("/api/loans", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const pending = data.loans.filter((loan: any) => loan.status === "pending").length;
+        setPendingLoans(pending);
+      } catch {
+        setPendingLoans(0);
+      }
+    };
+    fetchPendingLoans();
+    // Optionally poll every 60s
+    const interval = setInterval(fetchPendingLoans, 60000);
+    return () => clearInterval(interval);
+  }, [isAdmin, getAccessTokenSilently]);
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -59,6 +91,31 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+          {/* Show Member Dashboard link if authenticated */}
+          {isAuthenticated && (
+            <>
+              <Link
+                to="/dashboard"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+                  ${location.pathname === "/dashboard"
+                    ? "bg-white text-green-700 shadow"
+                    : "text-white hover:bg-green-600 hover:text-white"}
+                `}
+              >
+                My Member Dashboard
+              </Link>
+              <Link
+                to="/loan-application"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+                  ${location.pathname === "/loan-application"
+                    ? "bg-white text-green-700 shadow"
+                    : "text-white hover:bg-green-600 hover:text-white"}
+                `}
+              >
+                Loan Application
+              </Link>
+            </>
+          )}
           {/* Conditionally render Admin Panel link */}
           {isSuperAdmin && (
             <Link
@@ -70,6 +127,29 @@ export default function Navbar() {
               `}
             >
               Admin Panel
+              {isAdmin && pendingLoans > 0 && (
+                <span className="ml-2 inline-block bg-red-600 text-white text-xs rounded-full px-2 py-0.5 align-middle">
+                  {pendingLoans}
+                </span>
+              )}
+            </Link>
+          )}
+          {/* Add a direct link to Loan Dashboard for admins */}
+          {isAdmin && (
+            <Link
+              to="/admin/loans"
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+                ${location.pathname === "/admin/loans"
+                  ? "bg-white text-green-700 shadow"
+                  : "text-white hover:bg-green-600 hover:text-white"}
+              `}
+            >
+              Loan Dashboard
+              {pendingLoans > 0 && (
+                <span className="ml-2 inline-block bg-red-600 text-white text-xs rounded-full px-2 py-0.5 align-middle">
+                  {pendingLoans}
+                </span>
+              )}
             </Link>
           )}
         </div>

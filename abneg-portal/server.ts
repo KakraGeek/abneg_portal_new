@@ -4,12 +4,14 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { eq, and } from "drizzle-orm";
 import dotenv from "dotenv";
+import { expressjwt } from "express-jwt";
+import jwksRsa from "jwks-rsa";
 
 // Load environment variables
 dotenv.config();
 
 // Import schema
-import { users, roles, userRoles, members } from "./src/db/schema";
+import { users, roles, userRoles, members, loanRequests } from "./src/db/schema";
 
 // Database connection
 if (!process.env['DATABASE_URL']) {
@@ -41,6 +43,21 @@ const PORT = 5000; // Use a different port than Vite
 
 app.use(cors());
 app.use(express.json());
+
+const checkJwt = expressjwt({
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: `https://dev-5po0pxymvmjcxwug.us.auth0.com/.well-known/jwks.json`
+  }),
+  audience: "https://dev-5po0pxymvmjcxwug.us.auth0.com/api/v2/",
+  issuer: `https://dev-5po0pxymvmjcxwug.us.auth0.com/`,
+  algorithms: ["RS256"]
+});
+
+// Apply this middleware to all /api routes
+app.use("/api", checkJwt);
 
 // Test endpoint
 app.get("/api/hello", (req: any, res: any) => {
@@ -123,19 +140,21 @@ app.post("/api/users/register", async (req: any, res: any) => {
       roleId: defaultRole[0].id,
     });
 
-    // Create member record with logging
-    console.log("Attempting to insert into members table for userId:", newUser[0].id);
-    const insertedMembers = await db.insert(members).values({
-      userId: newUser[0].id,
-      status: "active",
-      location: "", // Provide default value for NOT NULL constraint
-      phone: "",    // Provide default value for NOT NULL constraint
-    }).returning();
-    console.log("Inserted member record:", insertedMembers);
+    // Check if member record already exists for this user
+    const existingMember = await db.select().from(members).where(eq(members.userId, newUser[0].id));
+    if (existingMember.length === 0) {
+      // Create member record
+      await db.insert(members).values({
+        userId: newUser[0].id,
+        status: "active",
+        phone: "",
+        location: "",
+      });
+    }
 
     res.status(201).json({ 
       user: newUser[0],
-      member: insertedMembers[0],
+      member: existingMember[0], // Use existingMember[0] to get the record
       message: "User registered successfully with member role" 
     });
   } catch (error) {
@@ -318,6 +337,193 @@ app.patch("/api/users/:id/role", requireSuperAdmin, async (req: any, res: any) =
   } catch (error) {
     console.error("Error updating user role:", error);
     res.status(500).json({ error: "Failed to update user role" });
+  }
+});
+
+// Create a new loan request
+app.post("/api/loans", async (req: any, res: any) => {
+  try {
+    const user = req.auth;
+    if (!user || !user.sub) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const {
+      amount,
+      purpose,
+      repaymentPeriod,
+      collateral,
+      contact,
+      location,
+      bankName,
+      bankBranch,
+      accountNumber,
+      guarantorName,
+      guarantorContact,
+      guarantorRelationship
+    } = req.body;
+    if (!amount || !purpose) {
+      return res.status(400).json({ error: "Amount and purpose are required" });
+    }
+    // Find user in DB
+    const dbUser = await db.select().from(users).where(eq(users.auth0Id, user.sub));
+    if (dbUser.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    // Insert loan request
+    const newLoan = await db.insert(loanRequests).values({
+      userId: dbUser[0].id,
+      amount,
+      purpose,
+      repaymentPeriod,
+      collateral,
+      contact,
+      location,
+      bankName,
+      bankBranch,
+      accountNumber,
+      guarantorName,
+      guarantorContact,
+      guarantorRelationship,
+      status: "pending",
+    }).returning();
+    res.status(201).json({ loan: newLoan[0] });
+  } catch (error) {
+    console.error("Error creating loan request:", error);
+    res.status(500).json({ error: "Failed to create loan request" });
+  }
+});
+
+// Get current member info (for dashboard)
+app.get("/api/members/me", async (req: any, res: any) => {
+  try {
+    // Extract Auth0 user info from request (assume middleware sets req.auth)
+    const user = req.auth;
+    if (!user || !user.sub) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    // Find user in DB
+    const dbUser = await db.select().from(users).where(eq(users.auth0Id, user.sub));
+    if (dbUser.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    // Find member info
+    const member = await db.select().from(members).where(eq(members.userId, dbUser[0].id));
+    if (member.length === 0) {
+      return res.status(404).json({ error: "Member record not found" });
+    }
+    // Placeholder for subscriptions (empty array for now)
+    const subscriptions = [];
+    res.json({
+      name: dbUser[0].name,
+      email: dbUser[0].email,
+      status: member[0].status,
+      joinedAt: member[0].joinedAt,
+      subscriptions,
+    });
+  } catch (error) {
+    console.error("Error fetching member dashboard info:", error);
+    res.status(500).json({ error: "Failed to fetch member info" });
+  }
+});
+
+// Update current member profile info
+app.patch("/api/members/me", async (req: any, res: any) => {
+  try {
+    const user = req.auth;
+    if (!user || !user.sub) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const { name, phone, location } = req.body;
+    // Find user in DB
+    const dbUser = await db.select().from(users).where(eq(users.auth0Id, user.sub));
+    if (dbUser.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    // Update name in users table if provided
+    if (name !== undefined) {
+      await db.update(users).set({ name }).where(eq(users.id, dbUser[0].id));
+    }
+    // Update phone/location in members table if provided
+    const member = await db.select().from(members).where(eq(members.userId, dbUser[0].id));
+    if (member.length === 0) {
+      return res.status(404).json({ error: "Member record not found" });
+    }
+    const updateFields: any = {};
+    if (phone !== undefined) updateFields.phone = phone;
+    if (location !== undefined) updateFields.location = location;
+    if (Object.keys(updateFields).length > 0) {
+      await db.update(members).set(updateFields).where(eq(members.userId, dbUser[0].id));
+    }
+    res.json({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("Error updating member profile:", error);
+    res.status(500).json({ error: "Failed to update profile" });
+  }
+});
+
+// --- Admin Middleware (admin or super_admin) ---
+function requireAdmin(req: any, res: any, next: any) {
+  const user = req.auth;
+  const roles = user && (user["https://abneg-portal/roles"] || []);
+  if (!roles.includes("admin") && !roles.includes("super_admin")) {
+    return res.status(403).json({ error: "Access denied: Admins only" });
+  }
+  next();
+}
+
+// Get all loan applications (admin only, pending first)
+app.get("/api/loans", requireAdmin, async (req: any, res: any) => {
+  try {
+    // Join with users to get applicant info if needed
+    // Use correct Drizzle orderBy syntax: orderBy(loanRequests.status, loanRequests.createdAt)
+    const allLoans = await db.select().from(loanRequests).orderBy(loanRequests.status, loanRequests.createdAt);
+    res.json({ loans: allLoans });
+  } catch (error) {
+    console.error("Error fetching loans:", error);
+    res.status(500).json({ error: "Failed to fetch loans" });
+  }
+});
+
+// Update loan application status (admin only)
+app.patch("/api/loans/:id", requireAdmin, async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const { status, adminNote } = req.body;
+    if (!status) {
+      return res.status(400).json({ error: "Status is required" });
+    }
+    // Optionally add adminNote column to schema if you want to store notes
+    const updateFields: any = { status };
+    if (adminNote !== undefined) updateFields.adminNote = adminNote;
+    const updated = await db.update(loanRequests).set(updateFields).where(eq(loanRequests.id, Number(id))).returning();
+    if (updated.length === 0) {
+      return res.status(404).json({ error: "Loan application not found" });
+    }
+    res.json({ loan: updated[0] });
+  } catch (error) {
+    console.error("Error updating loan status:", error);
+    res.status(500).json({ error: "Failed to update loan status" });
+  }
+});
+
+// Get all loan applications for the current member
+app.get("/api/my-loans", async (req: any, res: any) => {
+  try {
+    const user = req.auth;
+    if (!user || !user.sub) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    // Find user in DB
+    const dbUser = await db.select().from(users).where(eq(users.auth0Id, user.sub));
+    if (dbUser.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    // Get all loan requests for this user
+    const myLoans = await db.select().from(loanRequests).where(eq(loanRequests.userId, dbUser[0].id)).orderBy(loanRequests.createdAt);
+    res.json({ loans: myLoans });
+  } catch (error) {
+    console.error("Error fetching member loans:", error);
+    res.status(500).json({ error: "Failed to fetch member loans" });
   }
 });
 

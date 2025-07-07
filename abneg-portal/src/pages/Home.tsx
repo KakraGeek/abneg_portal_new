@@ -7,8 +7,7 @@ export default function Home() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Welcome to{" "}
-            <span className="text-green-600">ABNEG</span>
+            ABNEG Portal - Welcome!
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-4xl mx-auto">
             <strong>Agric Business Network - Ghana (ABNEG)</strong> is the nation's leading platform for uniting agricultural stakeholders. From farmers and agro-processors to policy experts and investors, ABNEG promotes innovation, inclusivity, and impact.

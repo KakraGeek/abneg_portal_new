@@ -201,7 +201,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Restrict `/admin` and other private routes to users with the "admin" role using Auth0's `useUser` + `getSession` + server-side `getSession()`.
+- [x] Restrict `/admin` and other private routes to users with the "admin" role using Auth0's `useUser` + `getSession` + server-side `getSession()`.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.
@@ -218,7 +218,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Build a member dashboard at `/dashboard` displaying name, status, and active subscriptions from Drizzle.
+- [x] Build a member dashboard at `/dashboard` displaying name, status, and active subscriptions from Drizzle.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.
@@ -235,7 +235,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Implement a form to update member profile info (name, phone, location) with Drizzle update query and REST mutation.
+- [x] Implement a form to update member profile info (name, phone, location) with Drizzle update query and REST mutation.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.

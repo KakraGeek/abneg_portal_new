@@ -25,11 +25,13 @@ export function useUserRegistration() {
       setStatus(prev => ({ ...prev, isLoading: true, error: null }));
 
       try {
+        const token = await getAccessTokenSilently();
         // First, check if user already exists
-        const response = await fetch(`http://localhost:5000/api/users/${user.sub}`, {
+        const response = await fetch(`/api/users/${user.sub}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
           },
         });
 
@@ -41,10 +43,11 @@ export function useUserRegistration() {
 
         if (response.status === 404) {
           // User doesn't exist, register them
-          const registerResponse = await fetch("http://localhost:5000/api/users/register", {
+          const registerResponse = await fetch("/api/users/register", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
             },
             body: JSON.stringify({
               auth0Id: user.sub,

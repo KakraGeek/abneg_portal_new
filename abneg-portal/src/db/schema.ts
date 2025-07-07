@@ -38,3 +38,24 @@ export const members = pgTable("members", {
   joinedAt: timestamp("joined_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Loan Requests table
+export const loanRequests = pgTable("loan_requests", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  amount: integer("amount").notNull(),
+  purpose: text("purpose").notNull(),
+  repaymentPeriod: text("repayment_period"),
+  collateral: text("collateral"),
+  contact: text("contact"),
+  location: text("location"),
+  bankName: text("bank_name"),
+  bankBranch: text("bank_branch"),
+  accountNumber: text("account_number"),
+  guarantorName: text("guarantor_name"),
+  guarantorContact: text("guarantor_contact"),
+  guarantorRelationship: text("guarantor_relationship"),
+  status: text("status").default("pending"), // e.g., 'pending', 'approved', 'rejected'
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});

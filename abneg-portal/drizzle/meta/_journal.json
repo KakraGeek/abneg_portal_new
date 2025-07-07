@@ -22,6 +22,20 @@
       "when": 1751839262609,
       "tag": "0002_chemical_pete_wisdom",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1751904424464,
+      "tag": "0003_absent_starbolt",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1751906316693,
+      "tag": "0004_common_the_call",
+      "breakpoints": true
     }
   ]
 }
