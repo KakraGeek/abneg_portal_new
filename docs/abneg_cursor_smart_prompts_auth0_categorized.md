@@ -252,7 +252,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Create a loan application form for members. Validate input using Zod and submit via REST to a `loan_requests` table.
+- [x] Create a loan application form for members. Validate input using Zod and submit via REST to a `loan_requests` table.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.

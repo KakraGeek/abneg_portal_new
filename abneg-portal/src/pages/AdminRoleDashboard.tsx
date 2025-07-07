@@ -109,10 +109,12 @@ const AdminRoleDashboard: React.FC = () => {
             {users.map((user) => (
               <tr key={user.id} className="border-b">
                 <td className="py-2 px-4 flex items-center gap-2">
+                  {/* Render user picture (if available) and name only once */}
                   {user.picture && (
                     <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full" />
                   )}
-                  <span>{user.name || "(No Name)"}</span>
+                  {/* Only render the name, and ensure it's not duplicated */}
+                  <span>{user.name?.split(" ").filter((v: string, i: number, arr: string[]) => arr.indexOf(v) === i).join(" ") || "(No Name)"}</span>
                 </td>
                 <td className="py-2 px-4">{user.email}</td>
                 <td className="py-2 px-4 capitalize">{user.roles[0]?.roleName || "-"}</td>
