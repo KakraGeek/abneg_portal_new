@@ -78,7 +78,7 @@ This PRD outlines the scope, objectives, and technical requirements for the deve
 ### 5.2 Tech Stack
 
 - **Frontend**: React (Vite) + Tailwind CSS + ShadCN UI
-- **Authentication**: Clerk.dev with RBAC, social login, and MFA
+- **Authentication**: Auth0 with RBAC, social login, and MFA
 - **Backend**: RESTful API endpoints using Vite or Express
 - **Database**: Neon PostgreSQL with Drizzle ORM
 - **DevOps Hosting**: Vercel (frontend/backend functions)

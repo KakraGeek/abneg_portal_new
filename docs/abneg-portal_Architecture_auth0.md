@@ -7,7 +7,7 @@
 |------------------|----------------------------------------|
 | Frontend         | React (Vite) + TypeScript              |
 | Styling/UI       | Tailwind CSS + ShadCN UI               |
-| Authentication   | Clerk.dev (RBAC, social login, MFA)    |
+| Authentication   | Auth0 (RBAC, social login, MFA)    |
 | Backend          | REST API Routes (Vite + Express)       |
 | Database         | Neon PostgreSQL                        |
 | ORM              | Drizzle ORM                            |
@@ -23,7 +23,7 @@
  ├── components/          # UI components
  ├── pages/               # React routes
  ├── api/                 # REST API route handlers
- │    ├── auth/           # Clerk session + auth logic
+ │    ├── auth/           # Auth0 session + auth logic
  │    ├── members/        # Member CRUD, dues, events
  │    └── admin/          # Admin-level endpoints
  ├── lib/                 # Utilities (db, auth, validators)
@@ -35,9 +35,9 @@
 
 ## 🔐 Authentication Flow
 
-- Clerk handles session and RBAC
+- Auth0 handles session and RBAC
 - Protected routes via `useUser()` and `withAuth()` wrappers
-- Admin pages gated by Clerk role (`admin`)
+- Admin pages gated by Auth0 role (`admin`)
 
 ---
 
@@ -76,7 +76,7 @@ Tables (via Drizzle ORM):
 
 ## 🔒 Security Considerations
 
-- Clerk-based auth + session handling
+- Auth0-based auth + session handling
 - API validation using Zod
 - Input/output sanitization
 - HTTPS enforced on all endpoints
