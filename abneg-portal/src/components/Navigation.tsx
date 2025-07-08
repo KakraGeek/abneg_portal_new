@@ -8,6 +8,7 @@ export default function Navigation() {
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
     { name: "Join", path: "/join" },
+    { name: "Events", path: "/events" },
   ];
 
   return (

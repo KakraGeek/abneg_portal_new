@@ -272,7 +272,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Add event registration functionality. List all events from `events` table and allow RSVP. Save RSVP responses in `registrations` table.
+- [x] Add event registration functionality. List all events from `events` table and allow RSVP. Save RSVP responses in `registrations` table.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.
@@ -289,7 +289,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Display member transaction history using Flutterwave receipts linked to the logged-in user. Include status, date, and amount.
+- [x] Display member transaction history using Flutterwave receipts linked to the logged-in user. Include status, date, and amount.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.
@@ -306,7 +306,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Build a homepage with mission, call-to-action (Join Us), and featured content blocks. Include a "Become a Member" button.
+- [x] Build a homepage with mission, call-to-action (Join Us), and featured content blocks. Include a "Become a Member" button.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.
@@ -323,7 +323,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Create the About page with preamble, objectives, and operational regions from static content.
+- [x] Create the About page with preamble, objectives, and operational regions from static content.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.
@@ -340,7 +340,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Design the Leadership page displaying Executive Council and Board members with bios and photos.
+- [x] Design the Leadership page displaying Executive Council and Board members with bios and photos.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.
@@ -448,7 +448,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Generate receipts after successful payment and store in a `payment_receipts` table linked to `user_id`.
+- [x] Generate receipts after successful payment and store in a `payment_receipts` table linked to `user_id`.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.

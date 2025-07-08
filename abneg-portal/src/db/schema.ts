@@ -59,3 +59,53 @@ export const loanRequests = pgTable("loan_requests", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Events table
+export const events = pgTable("events", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  date: timestamp("date").notNull(),
+  description: text("description"),
+  // Add more fields as needed (e.g., location, organizer)
+});
+
+// Registrations table (event RSVPs)
+export const registrations = pgTable("registrations", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").notNull().references(() => events.id, { onDelete: "cascade" }),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow(),
+  // Optionally, add a unique constraint for (eventId, userId) to prevent double RSVPs
+});
+
+// Payment Receipts table
+export const paymentReceipts = pgTable("payment_receipts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  amount: integer("amount").notNull(),
+  status: text("status").notNull(), // e.g., 'successful', 'pending', 'failed'
+  date: timestamp("date").notNull(), // Payment date
+  reference: text("reference"), // Flutterwave reference or transaction ID
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// News Posts table: stores each blog/news article
+export const newsPosts = pgTable("news_posts", {
+  id: serial("id").primaryKey(), // Unique ID for each post
+  title: text("title").notNull(), // Title of the post
+  content: text("content").notNull(), // Main content/body
+  featuredImageUrl: text("featured_image_url"), // URL for the featured image
+  createdAt: timestamp("created_at").defaultNow(), // When the post was created
+});
+
+// Tags table: stores each tag/category
+export const newsTags = pgTable("news_tags", {
+  id: serial("id").primaryKey(), // Unique ID for each tag
+  name: text("name").notNull().unique(), // Tag name (e.g., "Events", "Training")
+});
+
+// Join table: links posts and tags (many-to-many relationship)
+export const newsPostTags = pgTable("news_post_tags", {
+  postId: integer("post_id").notNull().references(() => newsPosts.id, { onDelete: "cascade" }), // Post ID
+  tagId: integer("tag_id").notNull().references(() => newsTags.id, { onDelete: "cascade" }), // Tag ID
+});

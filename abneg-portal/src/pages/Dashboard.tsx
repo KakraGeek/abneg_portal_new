@@ -11,6 +11,15 @@ interface MemberInfo {
   location: string;
 }
 
+// Add type for receipt
+interface Receipt {
+  id: number;
+  amount: number;
+  status: string;
+  date: string;
+  reference: string;
+}
+
 export default function Dashboard() {
   const { isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();
   const [member, setMember] = useState<MemberInfo | null>(null);
@@ -26,6 +35,11 @@ export default function Dashboard() {
   const [loans, setLoans] = useState<any[]>([]);
   const [loansLoading, setLoansLoading] = useState(false);
   const [loansError, setLoansError] = useState<string | null>(null);
+
+  // Transaction history state
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
+  const [receiptsLoading, setReceiptsLoading] = useState(false);
+  const [receiptsError, setReceiptsError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMember = async () => {
@@ -73,6 +87,30 @@ export default function Dashboard() {
       }
     };
     if (isAuthenticated) fetchLoans();
+  }, [isAuthenticated, getAccessTokenSilently]);
+
+  useEffect(() => {
+    const fetchReceipts = async () => {
+      setReceiptsLoading(true);
+      setReceiptsError(null);
+      try {
+        const token = await getAccessTokenSilently();
+        const res = await fetch("/api/receipts", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Failed to fetch receipts");
+        }
+        const data = await res.json();
+        setReceipts(data.receipts);
+      } catch (err: any) {
+        setReceiptsError(err.message);
+      } finally {
+        setReceiptsLoading(false);
+      }
+    };
+    if (isAuthenticated) fetchReceipts();
   }, [isAuthenticated, getAccessTokenSilently]);
 
   // Initialize form with member info when entering edit mode
@@ -260,6 +298,40 @@ export default function Dashboard() {
             </table>
           </div>
         ) : null}
+        {/* Transaction History Section */}
+        <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-500 mb-8">
+          <h2 className="text-xl font-bold text-blue-700 mb-4">Transaction History</h2>
+          {receiptsLoading ? (
+            <div className="text-blue-600">Loading receipts...</div>
+          ) : receiptsError ? (
+            <div className="text-red-600">{receiptsError}</div>
+          ) : receipts.length === 0 ? (
+            <div className="text-gray-600">No receipts found.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm border">
+                <thead>
+                  <tr className="bg-blue-100">
+                    <th className="px-4 py-2 text-left">Status</th>
+                    <th className="px-4 py-2 text-left">Date</th>
+                    <th className="px-4 py-2 text-left">Amount</th>
+                    <th className="px-4 py-2 text-left">Reference</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {receipts.map((r) => (
+                    <tr key={r.id} className="border-t">
+                      <td className="px-4 py-2 capitalize">{r.status}</td>
+                      <td className="px-4 py-2">{new Date(r.date).toLocaleString()}</td>
+                      <td className="px-4 py-2">₵{(r.amount / 100).toFixed(2)}</td>
+                      <td className="px-4 py-2 font-mono">{r.reference}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

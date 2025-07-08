@@ -8,6 +8,9 @@ import Join from "./pages/Join";
 import Dashboard from "./pages/Dashboard";
 import LoanApplication from "./pages/LoanApplication";
 import AdminLoanDashboard from "./pages/AdminLoanDashboard";
+import Events from "./pages/Events";
+import Leadership from "./pages/Leadership";
+import News from "./pages/News";
 import { useUserRegistration } from "./hooks/useUserRegistration";
 
 function App() {
@@ -25,6 +28,9 @@ function App() {
         <Route path="/admin/roles" element={<AdminRoleDashboard />} />
         <Route path="/loan-application" element={<LoanApplication />} />
         <Route path="/admin/loans" element={<AdminLoanDashboard />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/news" element={<News />} />
+        <Route path="/leadership" element={<Leadership />} />
       </Routes>
     </Router>
   );

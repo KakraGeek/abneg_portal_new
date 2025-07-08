@@ -2,16 +2,20 @@ import express from "express";
 import cors from "cors";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import dotenv from "dotenv";
+dotenv.config();
 import { expressjwt } from "express-jwt";
 import jwksRsa from "jwks-rsa";
-
-// Load environment variables
-dotenv.config();
+import { db } from "./src/db/connection"; // Your Drizzle DB connection
+import { events, registrations } from "./src/db/schema";
 
 // Import schema
 import { users, roles, userRoles, members, loanRequests } from "./src/db/schema";
+import { paymentReceipts } from "./src/db/schema";
+import { newsPosts, newsTags, newsPostTags } from "./src/db/schema";
+
+import type { Request, Response } from "express";
 
 // Database connection
 if (!process.env['DATABASE_URL']) {
@@ -36,8 +40,6 @@ pool.connect((err, client, release) => {
   }
 });
 
-const db = drizzle(pool);
-
 const app = express();
 const PORT = 5000; // Use a different port than Vite
 
@@ -56,7 +58,96 @@ const checkJwt = expressjwt({
   algorithms: ["RS256"]
 });
 
-// Apply this middleware to all /api routes
+// Public: Get all events
+app.get("/api/events", async (req, res) => {
+  try {
+    const allEvents = await db.select().from(events);
+    res.json(allEvents);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch events" });
+  }
+});
+
+// Public: Get paginated news posts with tags and featured image, with optional tag filtering
+app.get("/api/news", async (req: Request, res: Response) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
+    const offset = (page - 1) * limit;
+    const tagFilter = req.query.tag as string | undefined;
+
+    let posts;
+
+    if (tagFilter) {
+      // Find the tag ID for the given tag name
+      const tag = await db.select().from(newsTags).where(eq(newsTags.name, tagFilter));
+      if (tag.length === 0) {
+        res.json([]); // No posts if tag doesn't exist
+        return;
+      }
+      const tagId = tag[0].id;
+
+      // Find post IDs with this tag
+      const postTagLinks = await db.select().from(newsPostTags).where(eq(newsPostTags.tagId, tagId));
+      const postIds = postTagLinks.map((link) => link.postId);
+
+      if (postIds.length === 0) {
+        res.json([]); // No posts with this tag
+        return;
+      }
+
+      // Fetch posts with these IDs, with pagination
+      posts = await db
+        .select()
+        .from(newsPosts)
+        .where(inArray(newsPosts.id, postIds))
+        .limit(limit)
+        .offset(offset);
+    } else {
+      // No tag filter: fetch all posts
+      posts = await db
+        .select()
+        .from(newsPosts)
+        .limit(limit)
+        .offset(offset);
+    }
+
+    // For each post, fetch its tags
+    const postsWithTags = await Promise.all(
+      posts.map(async (post) => {
+        const tagLinks = await db
+          .select()
+          .from(newsPostTags)
+          .where(eq(newsPostTags.postId, post.id));
+        const tagIds = tagLinks.map((link) => link.tagId);
+        const tags = tagIds.length
+          ? await db.select().from(newsTags).where(inArray(newsTags.id, tagIds))
+          : [];
+        return {
+          ...post,
+          tags: tags.map((t) => t.name),
+        };
+      })
+    );
+
+    res.json(postsWithTags);
+  } catch (error) {
+    console.error("Error fetching news posts:", error);
+    res.status(500).json({ error: "Failed to fetch news posts" });
+  }
+});
+
+// Public: Get all news tags for filtering
+app.get("/api/news-tags", async (req: Request, res: Response) => {
+  try {
+    const tags = await db.select().from(newsTags);
+    res.json(tags);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch tags" });
+  }
+});
+
+// Apply this middleware to all /api routes (except /api/events)
 app.use("/api", checkJwt);
 
 // Test endpoint
@@ -524,6 +615,68 @@ app.get("/api/my-loans", async (req: any, res: any) => {
   } catch (error) {
     console.error("Error fetching member loans:", error);
     res.status(500).json({ error: "Failed to fetch member loans" });
+  }
+});
+
+app.post("/api/registrations", async (req: any, res: any) => {
+  // Get Auth0 user id from the authenticated session
+  const auth0Id = req.auth?.sub; // Auth0 user id (e.g., 'auth0|abc123')
+  const { eventId } = req.body;
+
+  // Input validation
+  if (!eventId) {
+    return res.status(400).json({ error: "Missing eventId" });
+  }
+  if (!auth0Id) {
+    return res.status(401).json({ error: "Unauthorized: No Auth0 user id found" });
+  }
+
+  try {
+    // Look up the user in the users table by Auth0 id
+    const userRecord = await db.select().from(users).where(eq(users.auth0Id, auth0Id));
+    if (userRecord.length === 0) {
+      return res.status(404).json({ error: "User not found in database" });
+    }
+    const userId = userRecord[0].id;
+
+    // Optional: Prevent duplicate RSVPs
+    const existing = await db
+      .select()
+      .from(registrations)
+      .where(and(eq(registrations.eventId, eventId), eq(registrations.userId, userId)));
+
+    if (existing.length > 0) {
+      return res.status(409).json({ error: "Already registered for this event" });
+    }
+
+    // Insert new registration
+    await db.insert(registrations).values({ eventId, userId });
+    res.status(201).json({ message: "RSVP successful" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to register RSVP" });
+  }
+});
+
+// Get payment receipts for the logged-in user
+app.get("/api/receipts", async (req: any, res: any) => {
+  try {
+    // Auth0 user ID is in req.auth.sub
+    const auth0Id = req.auth?.sub;
+    if (!auth0Id) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    // Find the user's numeric ID
+    const userRows = await db.select().from(users).where(eq(users.auth0Id, auth0Id));
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userId = userRows[0].id;
+    // Fetch receipts for this user
+    const receipts = await db.select().from(paymentReceipts).where(eq(paymentReceipts.userId, userId));
+    res.json({ receipts });
+  } catch (error) {
+    console.error("Error fetching receipts:", error);
+    res.status(500).json({ error: "Failed to fetch receipts" });
   }
 });
 

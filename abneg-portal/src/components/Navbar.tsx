@@ -59,7 +59,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
+    // About will be a dropdown, so remove About, Events, Media/Gallery, Partnerships from here
     { name: "Join", path: "/join" },
   ];
 
@@ -91,6 +91,41 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+          {/* About Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 flex items-center gap-1
+                  ${["/about","/leadership","/events","/media","/partnerships"].includes(location.pathname)
+                    ? "bg-white text-green-700 shadow"
+                    : "text-white hover:bg-green-600 hover:text-white"}
+                `}
+              >
+                About
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link to="/about">About ABNEG</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/leadership">Leadership & Governance</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/events">Events</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/news">News</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/media">Media/Gallery</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/partnerships">Partnerships</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           {/* Show Member Dashboard link if authenticated */}
           {isAuthenticated && (
             <>
