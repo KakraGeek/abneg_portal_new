@@ -14,6 +14,7 @@ export default function Navbar() {
   const location = useLocation();
   const [isSuperAdmin, setIsSuperAdmin] = React.useState(false);
   const [pendingLoans, setPendingLoans] = React.useState<number>(0);
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   // Check if user is admin or super_admin
   const [isAdmin, setIsAdmin] = React.useState(false);
@@ -79,7 +80,17 @@ export default function Navbar() {
     <nav className="w-full flex items-center justify-between px-6 py-2 bg-green-700 shadow h-14">
       <div className="flex items-center gap-8">
         <span className="text-2xl font-bold text-white tracking-tight">ABNEG Portal</span>
-        <div className="flex items-center space-x-4">
+        <button
+          className="md:hidden p-2 rounded text-white focus:outline-none"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Open menu"
+        >
+          {/* Hamburger icon (three lines) */}
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <div className="hidden md:flex items-center space-x-4">
           {/* Render Home link first */}
           <Link
             key="Home"
@@ -252,6 +263,156 @@ export default function Navbar() {
           </DropdownMenu>
         )}
       </div>
+      {isMenuOpen && (
+        <div className="flex flex-col md:hidden bg-green-700 w-full absolute top-14 left-0 z-50 shadow-lg">
+          {/* Repeat your nav links here, but stacked vertically */}
+          {/* Also include the login button or user dropdown here */}
+          <Link
+            to="/"
+            className="px-4 py-2 text-white hover:bg-green-600"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Home
+          </Link>
+          {/* About Dropdown next */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="px-4 py-2 rounded-md text-sm font-medium transition-colors duration-150 flex items-center gap-1 text-white hover:bg-green-600"
+              >
+                About
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link to="/about">About ABNEG</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/leadership">Leadership & Governance</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/events">Events</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/news">News</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/media">Media/Gallery</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/partnerships">Partnerships</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {/* Render Join and Contact links */}
+          {navLinks.filter(link => link.name !== "Home").map((link) => (
+            <Link
+              key={link.name}
+              to={link.path}
+              className="px-4 py-2 text-white hover:bg-green-600"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {link.name}
+            </Link>
+          ))}
+          {/* Show Member Dashboard link if authenticated */}
+          {isAuthenticated && (
+            <>
+              <Link
+                to="/dashboard"
+                className="px-4 py-2 text-white hover:bg-green-600"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                My Member Dashboard
+              </Link>
+              <Link
+                to="/loan-application"
+                className="px-4 py-2 text-white hover:bg-green-600"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Loan Application
+              </Link>
+            </>
+          )}
+          {/* Conditionally render Admin Panel link */}
+          {isSuperAdmin && (
+            <Link
+              to="/admin/roles"
+              className="px-4 py-2 text-white hover:bg-green-600"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Admin Panel
+              {isAdmin && pendingLoans > 0 && (
+                <span className="ml-2 inline-block bg-red-600 text-white text-xs rounded-full px-2 py-0.5 align-middle">
+                  {pendingLoans}
+                </span>
+              )}
+            </Link>
+          )}
+          {/* Add a direct link to Loan Dashboard for admins */}
+          {isAdmin && (
+            <Link
+              to="/admin/loans"
+              className="px-4 py-2 text-white hover:bg-green-600"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Loan Dashboard
+              {pendingLoans > 0 && (
+                <span className="ml-2 inline-block bg-red-600 text-white text-xs rounded-full px-2 py-0.5 align-middle">
+                  {pendingLoans}
+                </span>
+              )}
+            </Link>
+          )}
+          {/* Login button */}
+          {!isAuthenticated ? (
+            <button
+              className="px-4 py-2 bg-green-600 text-white rounded mt-2"
+              onClick={() => { setIsMenuOpen(false); loginWithRedirect(); }}
+            >
+              Login
+            </button>
+          ) : (
+            // User dropdown or sign out button
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="flex items-center h-8 px-2 rounded focus:outline-none border border-green-800 bg-green-600 hover:bg-green-800 transition"
+                  style={{ minWidth: "0", maxWidth: "220px" }}
+                >
+                  <Avatar>
+                    <AvatarImage
+                      src={user?.picture ? user.picture : undefined}
+                      alt={user?.name || "User"}
+                    />
+                    <AvatarFallback>
+                      {/* Show first initial or fallback SVG */}
+                      {user?.name ? user.name.charAt(0) : (
+                        <img
+                          src={`data:image/svg+xml,${fallbackAvatar}`}
+                          alt="User"
+                          className="w-5 h-5"
+                        />
+                      )}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="font-medium text-white ml-2 text-base truncate">{user?.name}</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {/* Sign out option */}
+                <DropdownMenuItem
+                  onSelect={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+                  variant="destructive"
+                >
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+      )}
     </nav>
   );
 }
