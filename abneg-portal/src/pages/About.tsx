@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function About() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">

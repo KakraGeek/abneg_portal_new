@@ -1,6 +1,4 @@
-import React from "react";
 import { useUserRoles } from "@/hooks/useUserRoles";
-import { Button } from "@/components/ui/button";
 
 export default function RoleTest() {
   const { user, isLoading, error, hasRole, isAdmin, isMember, isSuperAdmin } = useUserRoles();

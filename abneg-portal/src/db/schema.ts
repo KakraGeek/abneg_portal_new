@@ -109,3 +109,12 @@ export const newsPostTags = pgTable("news_post_tags", {
   postId: integer("post_id").notNull().references(() => newsPosts.id, { onDelete: "cascade" }), // Post ID
   tagId: integer("tag_id").notNull().references(() => newsTags.id, { onDelete: "cascade" }), // Tag ID
 });
+
+export const subscriptions = pgTable("subscriptions", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  price: integer("price").notNull(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});

@@ -4,7 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 console.log("AdminRoleDashboard file loaded");
 
 const AdminRoleDashboard: React.FC = () => {
-  const { getAccessTokenSilently, isAuthenticated, user } = useAuth0();
+  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const [users, setUsers] = useState<any[]>([]);
   const [roles, setRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

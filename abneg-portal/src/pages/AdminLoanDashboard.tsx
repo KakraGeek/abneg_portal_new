@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
 import RoleBasedRoute from "../components/auth/RoleBasedRoute";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useState, useEffect } from "react";
 
 interface Loan {
   id: number;
@@ -56,7 +56,7 @@ export default function AdminLoanDashboard() {
   }, []);
 
   const handleAction = async (id: number, status: string) => {
-    setActionStatus((prev) => ({ ...prev, [id]: "loading" }));
+    setActionStatus((prev: { [id: number]: string }) => ({ ...prev, [id]: "loading" }));
     try {
       const token = await getAccessTokenSilently();
       const res = await fetch(`/api/loans/${id}`, {
@@ -71,10 +71,10 @@ export default function AdminLoanDashboard() {
         const data = await res.json();
         throw new Error(data.error || "Failed to update loan status");
       }
-      setActionStatus((prev) => ({ ...prev, [id]: "success" }));
+      setActionStatus((prev: { [id: number]: string }) => ({ ...prev, [id]: "success" }));
       fetchLoans();
     } catch (err: any) {
-      setActionStatus((prev) => ({ ...prev, [id]: "error" }));
+      setActionStatus((prev: { [id: number]: string }) => ({ ...prev, [id]: "error" }));
     }
   };
 

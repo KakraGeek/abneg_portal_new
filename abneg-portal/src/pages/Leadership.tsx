@@ -1,5 +1,3 @@
-import React from "react";
-
 const executiveCouncil = [
   { role: "Chairman", name: "Dr. Kwame Mensah" },
   { role: "1st Vice Chair", name: "Nana Akosua Asantewaa" },

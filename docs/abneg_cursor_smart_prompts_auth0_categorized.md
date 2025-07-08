@@ -377,7 +377,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Implement a Contact page with ABNEG office locations, embedded map, and WhatsApp/email integration using `mailto:` and `wa.me/`.
+- [x] Implement a Contact page with ABNEG office locations, embedded map, and WhatsApp/email integration using `mailto:` and `wa.me/`.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.
@@ -394,7 +394,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Integrate Flutterwave for Mobile Money payments. Use Flutterwave's JavaScript SDK to initiate payment and webhook for confirmation.
+- [x] Integrate Flutterwave for Mobile Money payments. Use Flutterwave's JavaScript SDK to initiate payment and webhook for confirmation.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.

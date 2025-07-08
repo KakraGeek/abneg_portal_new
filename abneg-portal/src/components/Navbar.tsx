@@ -62,6 +62,7 @@ export default function Navbar() {
     { name: "Home", path: "/" },
     { name: "Join", path: "/join" },
     { name: "Contact", path: "/contact" },
+    { name: "Payments", path: "/payments" }, // Added Payments link
   ];
 
   // Fallback avatar: a small SVG with a subtle initial

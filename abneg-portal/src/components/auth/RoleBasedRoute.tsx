@@ -10,7 +10,6 @@ interface RoleBasedRouteProps {
 
 export default function RoleBasedRoute({ 
   children, 
-  requiredRole = "member",
   redirectTo 
 }: RoleBasedRouteProps) {
   const { isAuthenticated, isLoading } = useAuth0();
