@@ -360,7 +360,7 @@ You are an expert full-stack developer working on the ABNEG Portal.
 Your task is to implement the following requirement:
 
 ### TASK
-- [ ] Build Events & News section with blog-style entries. Support featured image, tags, and pagination.
+- [x] Build Events & News section with blog-style entries. Support featured image, tags, and pagination.
 
 ### EXPECTATIONS
 - Use best practices for clean, modular code.

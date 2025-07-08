@@ -57,10 +57,11 @@ export default function Navbar() {
     return () => clearInterval(interval);
   }, [isAdmin, getAccessTokenSilently]);
 
+  // Only include Home, Join, Contact in navLinks, and render About dropdown separately after Home
   const navLinks = [
     { name: "Home", path: "/" },
-    // About will be a dropdown, so remove About, Events, Media/Gallery, Partnerships from here
     { name: "Join", path: "/join" },
+    { name: "Contact", path: "/contact" },
   ];
 
   // Fallback avatar: a small SVG with a subtle initial
@@ -78,20 +79,19 @@ export default function Navbar() {
       <div className="flex items-center gap-8">
         <span className="text-2xl font-bold text-white tracking-tight">ABNEG Portal</span>
         <div className="flex items-center space-x-4">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
-                ${location.pathname === link.path
-                  ? "bg-white text-green-700 shadow"
-                  : "text-white hover:bg-green-600 hover:text-white"}
-              `}
-            >
-              {link.name}
-            </Link>
-          ))}
-          {/* About Dropdown */}
+          {/* Render Home link first */}
+          <Link
+            key="Home"
+            to="/"
+            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+              ${location.pathname === "/"
+                ? "bg-white text-green-700 shadow"
+                : "text-white hover:bg-green-600 hover:text-white"}
+            `}
+          >
+            Home
+          </Link>
+          {/* About Dropdown next */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -126,6 +126,20 @@ export default function Navbar() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          {/* Render Join and Contact links */}
+          {navLinks.filter(link => link.name !== "Home").map((link) => (
+            <Link
+              key={link.name}
+              to={link.path}
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+                ${location.pathname === link.path
+                  ? "bg-white text-green-700 shadow"
+                  : "text-white hover:bg-green-600 hover:text-white"}
+              `}
+            >
+              {link.name}
+            </Link>
+          ))}
           {/* Show Member Dashboard link if authenticated */}
           {isAuthenticated && (
             <>

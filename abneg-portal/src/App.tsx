@@ -11,6 +11,7 @@ import AdminLoanDashboard from "./pages/AdminLoanDashboard";
 import Events from "./pages/Events";
 import Leadership from "./pages/Leadership";
 import News from "./pages/News";
+import Contact from "./pages/Contact";
 import { useUserRegistration } from "./hooks/useUserRegistration";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path="/events" element={<Events />} />
         <Route path="/news" element={<News />} />
         <Route path="/leadership" element={<Leadership />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
     </Router>
   );
