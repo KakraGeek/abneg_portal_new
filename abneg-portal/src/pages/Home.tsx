@@ -1,8 +1,23 @@
+import HeroSlider from '../components/HeroSlider';
+
 export default function Home() {
+  // Hero slider images
+  const heroImages = [
+    '/hero-1.jpg',
+    '/hero-2.jpg',
+    '/hero-3.jpg',
+    '/hero-4.jpg',
+    '/hero-5.jpg',
+    '/hero-6.jpg'
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+      {/* Hero Slider */}
+      <HeroSlider images={heroImages} autoSlideInterval={5000} />
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Section */}
+        {/* Welcome Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             ABNEG Portal - Welcome!
@@ -13,13 +28,13 @@ export default function Home() {
           
           <div className="space-x-4">
             <button 
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-lg font-medium"
+              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-lg font-medium transition-colors duration-200"
               onClick={() => window.location.href = '/join'}
             >
               Become a Member
             </button>
             <button 
-              className="border border-green-300 text-green-700 px-8 py-3 rounded-lg text-lg font-medium hover:bg-green-50"
+              className="border border-green-300 text-green-700 px-8 py-3 rounded-lg text-lg font-medium hover:bg-green-50 transition-colors duration-200"
               onClick={() => window.location.href = '/about'}
             >
               Learn More
@@ -48,31 +63,31 @@ export default function Home() {
           </h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500 hover:shadow-lg transition-shadow duration-200">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Membership & Community</h3>
               <p className="text-gray-600">
                 Join a network of agricultural professionals and stakeholders committed to Ghana's agricultural development.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-shadow duration-200">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Business & Investment Opportunities</h3>
               <p className="text-gray-600">
                 Access funding, partnerships, and investment opportunities to grow your agricultural business.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-shadow duration-200">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Programs for Women & Youth</h3>
               <p className="text-gray-600">
                 Specialized programs designed to empower women and youth in the agricultural sector.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500">
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500 hover:shadow-lg transition-shadow duration-200">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Capacity Building and Training</h3>
               <p className="text-gray-600">
                 Enhance your skills with our comprehensive training programs and capacity building initiatives.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500">
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500 hover:shadow-lg transition-shadow duration-200">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Access to Agro-Input Support and Loans</h3>
               <p className="text-gray-600">
                 Get access to quality agricultural inputs and financial support to boost your farming operations.
@@ -89,7 +104,7 @@ export default function Home() {
               Join a growing network committed to the future of agriculture in Ghana and beyond.
             </p>
             <button 
-              className="bg-white text-green-600 hover:bg-gray-100 px-8 py-3 rounded-lg text-lg font-medium"
+              className="bg-white text-green-600 hover:bg-gray-100 px-8 py-3 rounded-lg text-lg font-medium transition-colors duration-200"
               onClick={() => window.location.href = '/join'}
             >
               Become a Member

@@ -680,6 +680,29 @@ app.get("/api/receipts", async (req: any, res: any) => {
   }
 });
 
+// Alias for /api/payments to match frontend expectations
+app.get("/api/payments", async (req: any, res: any) => {
+  try {
+    // Auth0 user ID is in req.auth.sub
+    const auth0Id = req.auth?.sub;
+    if (!auth0Id) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    // Find the user's numeric ID
+    const userRows = await db.select().from(users).where(eq(users.auth0Id, auth0Id));
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userId = userRows[0].id;
+    // Fetch receipts for this user
+    const receipts = await db.select().from(paymentReceipts).where(eq(paymentReceipts.userId, userId));
+    res.json({ receipts });
+  } catch (error) {
+    console.error("Error fetching receipts:", error);
+    res.status(500).json({ error: "Failed to fetch receipts" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Express server running at http://localhost:${PORT}`);
 });
