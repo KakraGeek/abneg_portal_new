@@ -36,16 +36,15 @@ const AdminRoleDashboard: React.FC = () => {
       try {
         setLoading(true);
         const token = await getAccessTokenSilently();
-        const usersRes = await fetch("/api/users", {
-          headers: { Authorization: `Bearer ${token}` },
-        }).then((r) => r.json());
-        const rolesRes = await fetch("/api/roles", {
-          headers: { Authorization: `Bearer ${token}` },
-        }).then((r) => r.json());
-        setUsers(Array.isArray(usersRes.users) ? usersRes.users : []);
-        setRoles(Array.isArray(rolesRes.roles) ? rolesRes.roles : []);
-        console.log("Fetched users:", usersRes.users);
-        console.log("Fetched roles:", rolesRes.roles);
+        const usersRes = await fetch("/api/users", { headers: { Authorization: `Bearer ${token}` } });
+        const usersData = await usersRes.json();
+        const rolesRes = await fetch("/api/roles", { headers: { Authorization: `Bearer ${token}` } });
+        const rolesData = await rolesRes.json();
+
+        setUsers(Array.isArray(usersData.users) ? usersData.users : []);
+        setRoles(Array.isArray(rolesData.roles) ? rolesData.roles : []);
+        console.log("Fetched users:", usersData.users);
+        console.log("Fetched roles:", rolesData.roles);
       } catch (err) {
         setError("Failed to load users or roles.");
         console.error("Error fetching users/roles:", err);
@@ -62,13 +61,10 @@ const AdminRoleDashboard: React.FC = () => {
     setSuccess(null);
     try {
       const token = await getAccessTokenSilently();
-      const res = await fetch(`/api/users/${userId}/role`, {
+      const res = await fetch(`/api/users?action=roles&userId=${userId}&roleName=${newRole}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ newRole }),
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ assignedBy: null }),
       });
       if (!res.ok) {
         const data = await res.json();

@@ -27,7 +27,7 @@ export function useUserRegistration() {
       try {
         const token = await getAccessTokenSilently();
         // First, check if user already exists
-        const response = await fetch(`/api/users/${user.sub}`, {
+        const response = await fetch(`/api/users?action=roles&userId=${user.sub}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export function useUserRegistration() {
 
         if (response.status === 404) {
           // User doesn't exist, register them
-          const registerResponse = await fetch("/api/users/register", {
+          const registerResponse = await fetch("/api/users?action=register", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

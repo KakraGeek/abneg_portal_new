@@ -28,7 +28,7 @@ export default function News() {
 
   // Fetch tags on mount
   useEffect(() => {
-    fetch("/api/news-tags")
+    fetch("/api/news?action=tags")
       .then((res) => res.json())
       .then((data) => setTags(data))
       .catch(() => setTags([]));

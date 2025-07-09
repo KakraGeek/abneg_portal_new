@@ -59,7 +59,8 @@ export function useUserRoles() {
       setStatus(prev => ({ ...prev, isLoading: true, error: null }));
 
       try {
-        const response = await fetch(`http://localhost:5000/api/users/${user.sub}`, {
+        // Use the new endpoint for roles
+        const response = await fetch(`/api/users?action=roles&userId=${user.sub}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -69,10 +70,10 @@ export function useUserRoles() {
         if (response.ok) {
           const data = await response.json();
           const userWithRoles = data.user as UserWithRoles;
-          
-          const hasRole = (roleName: string) => 
+
+          const hasRole = (roleName: string) =>
             userWithRoles.roles.some(role => role.roleName === roleName);
-          
+
           const isAdmin = hasRole("admin");
           const isMember = hasRole("member");
           const isSuperAdmin = hasRole("super_admin");

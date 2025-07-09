@@ -47,15 +47,13 @@ export default function Dashboard() {
         setLoading(true);
         setError(null);
         const token = await getAccessTokenSilently();
-        const res = await fetch("/api/members/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch("/api/loans?action=member", { headers: { Authorization: `Bearer ${token}` } });
         if (!res.ok) {
           const data = await res.json();
           throw new Error(data.error || "Failed to fetch member info");
         }
         const data = await res.json();
-        setMember(data);
+        setMember(data.member || {});
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -71,15 +69,13 @@ export default function Dashboard() {
       setLoansError(null);
       try {
         const token = await getAccessTokenSilently();
-        const res = await fetch("/api/my-loans", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch("/api/loans?action=my-loans", { headers: { Authorization: `Bearer ${token}` } });
         if (!res.ok) {
           const data = await res.json();
           throw new Error(data.error || "Failed to fetch loans");
         }
         const data = await res.json();
-        setLoans(data.loans);
+        setLoans(data.loans || []);
       } catch (err: any) {
         setLoansError(err.message);
       } finally {
@@ -95,15 +91,13 @@ export default function Dashboard() {
       setReceiptsError(null);
       try {
         const token = await getAccessTokenSilently();
-        const res = await fetch("/api/receipts", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch("/api/payments", { headers: { Authorization: `Bearer ${token}` } });
         if (!res.ok) {
           const data = await res.json();
           throw new Error(data.error || "Failed to fetch receipts");
         }
         const data = await res.json();
-        setReceipts(data.receipts);
+        setReceipts(data.receipts || []);
       } catch (err: any) {
         setReceiptsError(err.message);
       } finally {
@@ -135,7 +129,7 @@ export default function Dashboard() {
     setFormStatus({ success: null, error: null });
     try {
       const token = await getAccessTokenSilently();
-      const res = await fetch('/api/members/me', {
+      const res = await fetch('/api/loans?action=member', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -151,11 +145,12 @@ export default function Dashboard() {
       setEditMode(false);
       // Refetch member info
       setLoading(true);
-      const refreshed = await fetch('/api/members/me', {
+      const refreshed = await fetch('/api/loans?action=member', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (refreshed.ok) {
-        setMember(await refreshed.json());
+        const refreshedData = await refreshed.json();
+        setMember(refreshedData.member || {});
       }
     } catch (err: any) {
       setFormStatus({ success: null, error: err.message });
@@ -256,7 +251,7 @@ export default function Dashboard() {
         {/* Subscriptions Section (placeholder) */}
         <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500 mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Active Subscriptions</h2>
-          {member.subscriptions && member.subscriptions.length > 0 ? (
+          {Array.isArray(member.subscriptions) && member.subscriptions.length > 0 ? (
             <ul className="list-disc pl-6 text-gray-700">
               {member.subscriptions.map((sub, idx) => (
                 <li key={idx}>{JSON.stringify(sub)}</li>
