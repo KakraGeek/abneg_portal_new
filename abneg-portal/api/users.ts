@@ -1,7 +1,7 @@
 // abneg-portal/api/users.ts
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../src/db/connection';
-import { users, roles, userRoles } from '../src/db/schema';
+import { users, roles, userRoles, members } from '../src/db/schema';
 import { eq, and } from 'drizzle-orm';
 
 // Helper to extract Auth0 user ID from the Authorization header
@@ -118,7 +118,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // For PATCH, let's assume you want to assign a new role
     const { assignedBy } = req.body;
     try {
-      const user = await db.select().from(users).where(eq(users.auth0Id, userId as string));
+      let user;
+      if (!isNaN(Number(userId))) {
+        // If userId is a number, treat it as the database id
+        user = await db.select().from(users).where(eq(users.id, Number(userId)));
+      } else {
+        // Otherwise, treat it as auth0Id
+        user = await db.select().from(users).where(eq(users.auth0Id, userId as string));
+      }
       if (user.length === 0) {
         res.status(404).json({ error: 'User not found' });
         return;
