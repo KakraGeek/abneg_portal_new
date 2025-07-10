@@ -14,4 +14,6 @@ export default defineConfig({
       '/api': 'http://localhost:5000',
     },
   },
+  // For production build, the proxy is not needed as API calls go directly to Vercel functions
+  // For development, the proxy handles API calls to local Express server
 });

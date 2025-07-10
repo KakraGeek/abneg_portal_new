@@ -4,17 +4,18 @@ import { db } from '../src/db/connection';
 import { paymentReceipts } from '../src/db/schema';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method === 'POST') {
-    // Example: const { userId, amount, method } = req.body;
-    // Save payment to DB (not yet implemented)
-    res.status(200).json({ message: 'Payment received (not yet implemented)' });
-  } else if (req.method === 'GET') {
+  if (req.method === 'GET') {
     try {
-      const payments = await db.select().from(paymentReceipts);
-      res.status(200).json({ payments });
+      // This endpoint handles both /api/payments and /api/receipts
+      const receipts = await db.select().from(paymentReceipts);
+      res.status(200).json({ receipts });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch payments' });
+      console.error("Error fetching receipts:", error);
+      res.status(500).json({ error: 'Failed to fetch receipts' });
     }
+  } else if (req.method === 'POST') {
+    // Future: Handle payment processing
+    res.status(200).json({ message: 'Payment processing not yet implemented' });
   } else {
     res.status(405).json({ error: 'Method not allowed' });
   }

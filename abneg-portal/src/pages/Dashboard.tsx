@@ -47,7 +47,7 @@ export default function Dashboard() {
         setLoading(true);
         setError(null);
         const token = await getAccessTokenSilently();
-        const res = await fetch("/api/loans?action=member", { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch("/api/members?action=me", { headers: { Authorization: `Bearer ${token}` } });
         if (!res.ok) {
           const data = await res.json();
           throw new Error(data.error || "Failed to fetch member info");
@@ -129,7 +129,7 @@ export default function Dashboard() {
     setFormStatus({ success: null, error: null });
     try {
       const token = await getAccessTokenSilently();
-      const res = await fetch('/api/loans?action=member', {
+      const res = await fetch('/api/members?action=me', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ export default function Dashboard() {
       setEditMode(false);
       // Refetch member info
       setLoading(true);
-      const refreshed = await fetch('/api/loans?action=member', {
+      const refreshed = await fetch('/api/members?action=me', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (refreshed.ok) {

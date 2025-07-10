@@ -54,6 +54,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(404).json({ error: 'User not found' });
         return;
       }
+
+      // Ensure a members record exists for this user
+      const existingMember = await db.select().from(members).where(eq(members.userId, user[0].id));
+      if (existingMember.length === 0) {
+        await db.insert(members).values({
+          userId: user[0].id,
+          status: "active",
+          phone: "",
+          location: "",
+        });
+      }
+
       // Get roles for this user
       const userRoleData = await db
         .select({
