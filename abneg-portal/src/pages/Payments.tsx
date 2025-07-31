@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { usePageTitle } from '../hooks/usePageTitle';
 
 // Extend the Window interface to include FlutterwaveCheckout for TypeScript
 declare global {
@@ -53,6 +54,9 @@ const subscriptions = [
 ];
 
 const Payments: React.FC = () => {
+  // Set page title
+  usePageTitle('Payments');
+  
   const { isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
 
   if (isLoading) {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { usePageTitle } from '../hooks/usePageTitle';
 
 // Define a type for event data (adjust fields as needed)
 type Event = {
@@ -13,6 +14,9 @@ type Event = {
 };
 
 export default function Events() {
+  // Set page title
+  usePageTitle('Events');
+  
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

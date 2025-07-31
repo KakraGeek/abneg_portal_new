@@ -1,6 +1,9 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function Admin() {
+  // Set page title
+  usePageTitle('Admin Panel');
   const { user, logout } = useAuth0();
 
   const handleLogout = () => {

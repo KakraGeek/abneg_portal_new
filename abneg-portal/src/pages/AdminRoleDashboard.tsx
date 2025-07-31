@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { usePageTitle } from '../hooks/usePageTitle';
 
 console.log("AdminRoleDashboard file loaded");
 
 const AdminRoleDashboard: React.FC = () => {
+  // Set page title
+  usePageTitle('Admin - Role Management');
+  
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const [users, setUsers] = useState<any[]>([]);
   const [roles, setRoles] = useState<any[]>([]);

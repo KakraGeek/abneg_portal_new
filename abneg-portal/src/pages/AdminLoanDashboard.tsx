@@ -1,6 +1,7 @@
 import RoleBasedRoute from "../components/auth/RoleBasedRoute";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useState, useEffect } from "react";
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Loan {
   id: number;
@@ -23,6 +24,9 @@ interface Loan {
 }
 
 export default function AdminLoanDashboard() {
+  // Set page title
+  usePageTitle('Admin - Loan Management');
+  
   const { getAccessTokenSilently } = useAuth0();
   const [loans, setLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(true);

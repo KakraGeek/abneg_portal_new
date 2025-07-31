@@ -1,3 +1,5 @@
+import { usePageTitle } from '../hooks/usePageTitle';
+
 const executiveCouncil = [
   { role: "Chairman", name: "Dr. Kwame Mensah" },
   { role: "1st Vice Chair", name: "Nana Akosua Asantewaa" },
@@ -10,6 +12,8 @@ const executiveCouncil = [
 ];
 
 export default function Leadership() {
+  // Set page title
+  usePageTitle('Leadership');
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">

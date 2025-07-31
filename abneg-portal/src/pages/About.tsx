@@ -1,6 +1,13 @@
+import { usePageTitle } from '../hooks/usePageTitle';
+import { SEO, SEO_CONFIGS } from '../components/SEO';
+
 export default function About() {
+  // Set page title
+  usePageTitle('About Us');
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+    <>
+      <SEO {...SEO_CONFIGS.about} />
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Page Title */}
         <div className="text-center mb-12">
@@ -61,5 +68,6 @@ export default function About() {
         </div>
       </div>
     </div>
+    </>
   );
 } 

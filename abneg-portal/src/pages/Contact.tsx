@@ -1,9 +1,12 @@
 import React from 'react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 // Contact page for ABNEG Portal
 // This page displays office location, contact info, and quick links for email and WhatsApp
 
 const Contact: React.FC = () => {
+  // Set page title
+  usePageTitle('Contact Us');
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow mt-8">
       {/* Page Title */}

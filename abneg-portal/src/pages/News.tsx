@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { usePageTitle } from '../hooks/usePageTitle';
 
 // Define types for news post and tag
 interface NewsPost {
@@ -17,6 +18,9 @@ interface Tag {
 const POSTS_PER_PAGE = 4;
 
 export default function News() {
+  // Set page title
+  usePageTitle('News');
+  
   // State for posts, tags, selected tag, page, loading, and error
   const [posts, setPosts] = useState<NewsPost[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);

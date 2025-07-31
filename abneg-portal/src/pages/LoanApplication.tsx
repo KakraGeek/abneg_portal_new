@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { z } from "zod";
 import RoleBasedRoute from "../components/auth/RoleBasedRoute";
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const loanSchema = z.object({
   amount: z
@@ -21,6 +22,9 @@ const loanSchema = z.object({
 });
 
 export default function LoanApplication() {
+  // Set page title
+  usePageTitle('Loan Application');
+  
   const { getAccessTokenSilently } = useAuth0();
   const [form, setForm] = useState({
     amount: "",

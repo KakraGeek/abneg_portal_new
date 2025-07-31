@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { HelmetProvider } from 'react-helmet-async';
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import AdminRoleDashboard from "./pages/AdminRoleDashboard";
@@ -15,27 +17,34 @@ import Payments from "./pages/Payments";
 import { useUserRegistration } from "./hooks/useUserRegistration";
 
 function App() {
+  // Set default page title
+  useEffect(() => {
+    document.title = 'ABNEG';
+  }, []);
+  
   // Ensure user is provisioned in the database after login
   useUserRegistration();
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        {/* Add About and Join routes as placeholders for now */}
-        <Route path="/about" element={<About />} />
-        <Route path="/join" element={<Join />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/admin/roles" element={<AdminRoleDashboard />} />
-        <Route path="/loan-application" element={<LoanApplication />} />
-        <Route path="/admin/loans" element={<AdminLoanDashboard />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/news" element={<News />} />
-        <Route path="/leadership" element={<Leadership />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/payments" element={<Payments />} />
-      </Routes>
-    </Router>
+    <HelmetProvider>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          {/* Add About and Join routes as placeholders for now */}
+          <Route path="/about" element={<About />} />
+          <Route path="/join" element={<Join />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin/roles" element={<AdminRoleDashboard />} />
+          <Route path="/loan-application" element={<LoanApplication />} />
+          <Route path="/admin/loans" element={<AdminLoanDashboard />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/leadership" element={<Leadership />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/payments" element={<Payments />} />
+        </Routes>
+      </Router>
+    </HelmetProvider>
   );
 }
 

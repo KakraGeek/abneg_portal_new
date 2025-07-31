@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface MemberInfo {
   name: string;
@@ -21,6 +22,9 @@ interface Receipt {
 }
 
 export default function Dashboard() {
+  // Set page title
+  usePageTitle('Dashboard');
+  
   const { isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();
   const [member, setMember] = useState<MemberInfo | null>(null);
   const [loading, setLoading] = useState(true);
