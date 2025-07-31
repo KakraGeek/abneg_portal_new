@@ -256,6 +256,30 @@ export const SEO_CONFIGS = {
       "name": "ABNEG Payment Portal",
       "description": "Secure payment portal for ABNEG services"
     }
+  },
+  
+  partnerships: {
+    title: 'Partnerships',
+    description: 'Explore partnership opportunities with ABNEG - Agric Business Network Ghana. Connect with financial institutions, NGOs, investors, and government agencies for collaborative agricultural development.',
+    keywords: 'ABNEG partnerships, agricultural collaboration Ghana, farming partnerships, agribusiness opportunities, Ghana agricultural investment, agricultural development partnerships',
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ABNEG Partnerships",
+      "description": "Partnership opportunities in Ghana's agricultural sector"
+    }
+  },
+  
+  media: {
+    title: 'Media & Gallery',
+    description: 'Explore ABNEG\'s media gallery featuring blog articles, videos, and photos showcasing our impact on Ghana\'s agricultural sector. Stay updated with latest news and success stories.',
+    keywords: 'ABNEG media, agricultural blog Ghana, farming videos, agribusiness gallery, Ghana agricultural photos, farming success stories, agricultural news Ghana',
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "ABNEG Media & Gallery",
+      "description": "Media gallery and blog articles from ABNEG"
+    }
   }
 };
 

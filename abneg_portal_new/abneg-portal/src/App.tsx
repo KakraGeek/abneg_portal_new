@@ -13,6 +13,8 @@ import Leadership from "./pages/Leadership";
 import News from "./pages/News";
 import Contact from "./pages/Contact";
 import Payments from "./pages/Payments";
+import Partnerships from "./pages/Partnerships";
+import Media from "./pages/Media";
 import { useUserRegistration } from "./hooks/useUserRegistration";
 
 function App() {
@@ -40,6 +42,8 @@ function App() {
         <Route path="/leadership" element={<Leadership />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/payments" element={<Payments />} />
+        <Route path="/partnerships" element={<Partnerships />} />
+        <Route path="/media" element={<Media />} />
       </Routes>
     </Router>
   );
