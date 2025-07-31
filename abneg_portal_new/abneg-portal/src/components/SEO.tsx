@@ -24,7 +24,7 @@ export const SEO: React.FC<SEOProps> = ({
   structuredData
 }) => {
   const fullTitle = `ABNEG - ${title}`;
-  const baseUrl = 'https://abneg-portal-cc2de8wxa-desmond-asiedus-projects.vercel.app';
+  const baseUrl = 'https://abneg-portal.vercel.app';
   const fullUrl = url ? `${baseUrl}${url}` : baseUrl;
   const fullImage = image.startsWith('http') ? image : `${baseUrl}${image}`;
 
@@ -133,8 +133,8 @@ export const SEO_CONFIGS = {
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "Agric Business Network - Ghana (ABNEG)",
-      "url": "https://abneg-portal-cc2de8wxa-desmond-asiedus-projects.vercel.app",
-      "logo": "https://abneg-portal-cc2de8wxa-desmond-asiedus-projects.vercel.app/logo.png",
+      "url": "https://abneg-portal.vercel.app",
+      "logo": "https://abneg-portal.vercel.app/logo.png",
       "description": "Leading agricultural business network in Ghana connecting farmers, agro-processors, and investors",
       "address": {
         "@type": "PostalAddress",

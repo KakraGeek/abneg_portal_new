@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://abneg-portal-cc2de8wxa-desmond-asiedus-projects.vercel.app/sitemap.xml
+Sitemap: https://abneg-portal.vercel.app/sitemap.xml
 
 # Disallow admin and private areas
 Disallow: /admin/
