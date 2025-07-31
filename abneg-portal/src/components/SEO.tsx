@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { useEffect } from 'react';
 
 interface SEOProps {
   title: string;
@@ -12,7 +12,7 @@ interface SEOProps {
 
 /**
  * Comprehensive SEO component for ABNEG Portal
- * Handles meta tags, Open Graph, Twitter Cards, and structured data
+ * Uses native document API instead of react-helmet-async for React 19 compatibility
  */
 export const SEO: React.FC<SEOProps> = ({
   title,
@@ -27,52 +27,99 @@ export const SEO: React.FC<SEOProps> = ({
   const fullUrl = url ? `https://abneg.org${url}` : 'https://abneg.org';
   const fullImage = image.startsWith('http') ? image : `https://abneg.org${image}`;
 
-  return (
-    <Helmet>
-      {/* Basic Meta Tags */}
-      <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      {keywords && <meta name="keywords" content={keywords} />}
-      <meta name="robots" content="index, follow" />
-      <meta name="author" content="Agric Business Network - Ghana (ABNEG)" />
-      <meta name="language" content="English" />
-      <meta name="revisit-after" content="7 days" />
+  useEffect(() => {
+    // Update document title
+    document.title = fullTitle;
+
+    // Update or create meta tags
+    const updateMetaTag = (name: string, content: string) => {
+      let meta = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.name = name;
+        document.head.appendChild(meta);
+      }
+      meta.content = content;
+    };
+
+    const updatePropertyMetaTag = (property: string, content: string) => {
+      let meta = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('property', property);
+        document.head.appendChild(meta);
+      }
+      meta.content = content;
+    };
+
+    // Basic Meta Tags
+    updateMetaTag('description', description);
+    if (keywords) {
+      updateMetaTag('keywords', keywords);
+    }
+    updateMetaTag('robots', 'index, follow');
+    updateMetaTag('author', 'Agric Business Network - Ghana (ABNEG)');
+    updateMetaTag('language', 'English');
+    updateMetaTag('revisit-after', '7 days');
+    
+    // Canonical URL
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = fullUrl;
+    
+    // Open Graph Meta Tags
+    updatePropertyMetaTag('og:title', fullTitle);
+    updatePropertyMetaTag('og:description', description);
+    updatePropertyMetaTag('og:type', type);
+    updatePropertyMetaTag('og:url', fullUrl);
+    updatePropertyMetaTag('og:image', fullImage);
+    updatePropertyMetaTag('og:image:width', '1200');
+    updatePropertyMetaTag('og:image:height', '630');
+    updatePropertyMetaTag('og:site_name', 'ABNEG - Agric Business Network Ghana');
+    updatePropertyMetaTag('og:locale', 'en_US');
+    
+    // Twitter Card Meta Tags
+    updateMetaTag('twitter:card', 'summary_large_image');
+    updateMetaTag('twitter:title', fullTitle);
+    updateMetaTag('twitter:description', description);
+    updateMetaTag('twitter:image', fullImage);
+    updateMetaTag('twitter:site', '@ABNEG_Ghana');
+    updateMetaTag('twitter:creator', '@ABNEG_Ghana');
+    
+    // Structured Data
+    if (structuredData) {
+      // Remove existing structured data
+      const existingScript = document.querySelector('script[data-seo-structured]');
+      if (existingScript) {
+        existingScript.remove();
+      }
       
-      {/* Canonical URL */}
-      <link rel="canonical" href={fullUrl} />
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.setAttribute('data-seo-structured', 'true');
+      script.textContent = JSON.stringify(structuredData);
+      document.head.appendChild(script);
+    }
+
+    // Cleanup function
+    return () => {
+      // Reset title to default
+      document.title = 'ABNEG - Agric Business Network Ghana';
       
-      {/* Open Graph Meta Tags */}
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:type" content={type} />
-      <meta property="og:url" content={fullUrl} />
-      <meta property="og:image" content={fullImage} />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
-      <meta property="og:site_name" content="ABNEG - Agric Business Network Ghana" />
-      <meta property="og:locale" content="en_US" />
-      
-      {/* Twitter Card Meta Tags */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={fullImage} />
-      <meta name="twitter:site" content="@ABNEG_Ghana" />
-      <meta name="twitter:creator" content="@ABNEG_Ghana" />
-      
-      {/* Additional Meta Tags */}
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta name="theme-color" content="#16a34a" />
-      <meta name="msapplication-TileColor" content="#16a34a" />
-      
-      {/* Structured Data */}
-      {structuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
-        </script>
-      )}
-    </Helmet>
-  );
+      // Remove structured data on unmount
+      const script = document.querySelector('script[data-seo-structured]');
+      if (script) {
+        script.remove();
+      }
+    };
+  }, [fullTitle, description, keywords, fullUrl, fullImage, type, structuredData]);
+
+  // This component doesn't render anything
+  return null;
 };
 
 // Predefined SEO configurations for different pages
